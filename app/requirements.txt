@@ -6,3 +6,4 @@ wechatpy
 PyCrypto
 qrcode
 pillow
+crc16

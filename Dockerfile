@@ -50,5 +50,5 @@ COPY . /home/docker/code/
 # be installed in the code/app/ directory
 # RUN django-admin.py startproject website /home/docker/code/app/
 
-EXPOSE 80
+EXPOSE 80 9999
 CMD ["supervisord", "-n"]
