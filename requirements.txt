@@ -2,8 +2,3 @@ django
 django_redis_sessions
 django_redis_cache
 pymysql
-wechatpy
-PyCrypto
-qrcode
-pillow
-crc16
