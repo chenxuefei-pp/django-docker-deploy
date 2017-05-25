@@ -1,5 +1,5 @@
 #!/bin/bash
 
-pip install -r ./app/requirements.txt
+pip3 install -r /home/docker/code/app/requirements.txt
 
 python /home/docker/code/app/manage.py collectstatic --noinput
