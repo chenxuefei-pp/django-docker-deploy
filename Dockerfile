@@ -43,7 +43,6 @@ COPY supervisor-app.conf /etc/supervisor/conf.d/
 # add (the rest of) our code
 COPY . /home/docker/code/
 
-COPY app/requirements.txt /home/docker/code/app/
 RUN pip3 install -r /home/docker/code/requirements.txt
 
 # install django, normally you would remove this step because your project would already
