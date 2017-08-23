@@ -1,41 +1,11 @@
-# Django, uWSGI and Nginx in a container, using Supervisord
+# Django, uWSGI in a container, using Supervisord
 
-This Dockerfile shows you *how* to build a Docker container with a fairly standard
-and speedy setup for Django with uWSGI and Nginx.
+## 包含Django和uWSGI 输出uwsgi协议端口 外部nginx转发
 
-uWSGI from a number of benchmarks has shown to be the fastest server 
-for python applications and allows lots of flexibility. But note that we have
-not done any form of optimalization on this package. Modify it to your needs.
+该镜像相比于`no-nginx`镜像采用了动态配置文件和动态启动脚本，依次挂载在
 
-Nginx has become the standard for serving up web applications and has the 
-additional benefit that it can talk to uWSGI using the uWSGI protocol, further
-eliminating overhead. 
+* `/home/docker/code/custom/` 这个是动态启动脚本
 
-Most of this setup comes from the excellent tutorial on 
-https://uwsgi.readthedocs.org/en/latest/tutorials/Django_and_nginx.html
+* `/home/docker/code/config/` 这个是动态`Supervisord`配置文件
 
-The best way to use this repository is as an example. Clone the repository to 
-a location of your liking, and start adding your files / change the configuration 
-as needed. Once you're really into making your project you'll notice you've 
-touched most files here.
-
-### Build and run
-#### Build with python3
-* `docker build -t webapp .`
-* `docker run -d -p 80:80 webapp`
-* go to 127.0.0.1 to see if works
-
-#### Build with python2
-* `docker build -f Dockerfile-py2 -t webapp .`
-* `docker run -d -p 80:80 webapp`
-* go to 127.0.0.1 to see if works
-
-### How to insert your application
-
-In /app currently a django project is created with startproject. You will
-probably want to replace the content of /app with the root of your django
-project. Then also remove the line of django-app startproject from the 
-Dockerfile
-
-uWSGI chdirs to /app so in uwsgi.ini you will need to make sure the python path
-to the wsgi.py file is relative to that.
+可以采用动态`Supervisord`配置文件加载启动脚本，实现自定义`daemon`

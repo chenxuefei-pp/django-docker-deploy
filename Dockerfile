@@ -1,41 +1,8 @@
-# Copyright 2013 Thatcher Peskens
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# For Version Python 3.6 and Debian 8.0
 
 FROM python:3.6
 
 MAINTAINER ChenXuefei
-
-RUN mv /etc/apt/sources.list /etc/apt/sources.list.bk
-COPY sources.list /etc/apt/sources.list
-
-# Install required packages and remove the apt packages cache when done.
-
-RUN apt-get update -y && \
-    apt-get install -y --force-yes \
-	git \
-	nginx \
-	supervisor && \
-	pip3 install -U pip setuptools && \
-   rm -rf /var/lib/apt/lists/*
-
-# install uwsgi now because it takes a little while
-RUN pip3 install uwsgi
-
-# setup all the configfiles
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf
-COPY nginx-app.conf /etc/nginx/sites-available/default
-COPY supervisor-app.conf /etc/supervisor/conf.d/
 
 # COPY requirements.txt and RUN pip install BEFORE adding the rest of your code, this will cause Docker's caching mechanism
 # to prevent re-installing (all your) dependencies when you made a change a line or two in your app.
@@ -43,13 +10,27 @@ COPY supervisor-app.conf /etc/supervisor/conf.d/
 # add (the rest of) our code
 COPY . /home/docker/code/
 
-RUN mkdir -p ~/.pip && mv /home/docker/code/pip.conf ~/.pip
+# update apt source and pip source by copy file
+RUN mv /etc/apt/sources.list /etc/apt/sources.list.bk && \
+	cp /home/docker/code/sources.list /etc/apt/sources.list && \
+	mkdir -p /root/.pip && \
+	cp /home/docker/code/pip.conf /root/.pip/pip.conf
 
-RUN pip3 install -r /home/docker/code/requirements.txt
+# Install required packages and remove the apt packages cache when done.
+
+RUN apt-get update -y && \
+    apt-get install -y --force-yes \
+	git \
+	supervisor && \
+	pip3 install -U pip setuptools && \
+	pip3 install uwsgi && \
+  rm -rf /var/lib/apt/lists/*
 
 # install django, normally you would remove this step because your project would already
 # be installed in the code/app/ directory
 # RUN django-admin.py startproject website /home/docker/code/app/
 
-EXPOSE 80
-CMD ["supervisord", "-n"]
+RUN pip3 install -r /home/docker/code/requirements.txt
+
+EXPOSE 9090
+CMD ["bash", "/home/docker/code/entrypoint.sh"]
