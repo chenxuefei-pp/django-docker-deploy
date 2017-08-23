@@ -24,7 +24,6 @@ RUN apt-get update -y && \
 	supervisor && \
 	pip3 install -U pip setuptools && \
 	pip3 install uwsgi && \
-	cp /home/docker/code/supervisor-app.conf /etc/supervisor/conf.d/ && \
   rm -rf /var/lib/apt/lists/*
 
 # install django, normally you would remove this step because your project would already
@@ -34,4 +33,4 @@ RUN apt-get update -y && \
 RUN pip3 install -r /home/docker/code/requirements.txt
 
 EXPOSE 9090
-CMD ["supervisord", "-n"]
+CMD ["bash", "/home/docker/code/entrypoint.sh"]
